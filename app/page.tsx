@@ -1,5 +1,9 @@
+import TodoList from "@/components/TodoList";
+
 export default function Home() {
     return (
-        <div>State Management</div>
+        <div>
+            <TodoList />
+        </div>
     );
 }
