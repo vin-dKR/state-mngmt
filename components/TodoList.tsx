@@ -1,28 +1,35 @@
 "use client"
 
+import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
-import { useEffect, useState } from "react"
 
 interface Todo {
     id: number
     title: string
 }
+
 const TodoList = () => {
 
-    const [todos, setTodos] = useState<Todo[]>([])
-    const [err, setErr] = useState('')
+    const fetchTodos = async (): Promise<Todo[]> => {
+        const res = axios.get<Todo[]>("https://jsonplaceholder.typicode.com/todos")
+            .then((res) => res.data)
+            .catch((err) => err)
 
-    useEffect(() => {
-        axios.get("https://jsonplaceholder.typicode.com/todos")
-            .then((res) => setTodos(res.data))
-            .catch((err) => setErr(err))
-    }, [])
+        return res
+    }
 
-    if (err) return <p className="text-red-500">{err}</p>
+    const { data: todos, error, isPending } = useQuery({
+        queryKey: ["TodoList"],
+        queryFn: fetchTodos
+    })
+
+    if (error) return <p className="text-red-500">{error.message}</p>
+
+    if (isPending) return <div className="bg-blue-500 rounded-full h-10 w-10" />
 
     return (
         <div>
-            {todos.map((todo) => (
+            {todos?.map((todo: Todo) => (
                 <p key={todo.id}>
                     {todo.title}
                 </p>
